@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="test-listPage">
+	<select id="getDataFromAM_WFTEST" resultClass="hashmap" parameterClass="map">
+  	select * from wftest w
+  	<dynamic prepend="WHERE">
+  		<isNotNull prepend="AND" property="statusbox1">
+  			F1 like #statusbox1#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="listtype">
+	  		<isEqual property="listtype" compareValue="WF_COMPO_DRAFT">
+	  			exists(select WF_DRAFT_ID from as_wf_draft d where w.PROCESS_INST_ID=d.WF_DRAFT_ID and user_id=#executor# and compo_id=#wfcompoId#)
+	  		</isEqual>
+	  		<isEqual property="listtype" compareValue="WF_FILTER_COMPO_TODO">
+	  			exists(select instance_id from v_wf_current_task t where w.PROCESS_INST_ID=t.INSTANCE_ID and executor =#executor# and compo_id=#wfcompoId#)
+	  		</isEqual>
+	  		<isEqual property="listtype" compareValue="WF_FILTER_COMPO_DONE">
+	  			exists(select instance_id from v_wf_action_history  h where w.PROCESS_INST_ID=h.instance_id and executor = #executor# and compo_id=#wfcompoId#)
+	  		</isEqual>
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="ID">
+  			ID = #ID#
+  		</isNotNull>  		
+  	</dynamic>
+  </select>
+  <select id="getTreeDataFromAS_COMPANY" resultClass="hashmap" parameterClass="map">
+  	Select co_Code As Code, Parent_Co_Code As p_Code, Co_Name As Name, Co_Code, Co_Name From V_MA_COMPANY_PROVIDER MASTER 
+  	<dynamic prepend="WHERE">
+  		<isNotNull prepend="AND" property="nd">
+  			MASTER.nd = #nd#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="matchCond">
+  			(MASTER.co_code like #matchCond# or MASTER.co_name like #matchCond#)
+  		</isNotNull>
+  	</dynamic>	
+  	Order By p_Code, Code
+  	
+  </select>
+  <select id="getValsetFromAS_FUNC" resultClass="hashmap" parameterClass="map">
+  	select FUNC_ID as VAL_ID,FUNC_DESC as VAL from AS_FUNC MASTER
+  	<dynamic prepend="WHERE">
+  		<isNotNull prepend="AND" property="is_grant_to_all">
+  			MASTER.is_grant_to_all = #is_grant_to_all#
+  		</isNotNull>
+  	</dynamic>	  	
+  </select> 
+</sqlMap>

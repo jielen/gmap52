@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.2//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gmap-priv">
+
+  <typeAlias alias="page" type="com.anyi.gp.desktop.Title" />
+  <typeAlias alias="apMenu" type="com.anyi.gp.desktop.MenuFolder" />
+  <typeAlias alias="apCompo" type="com.anyi.gp.desktop.MenuLeaf" />
+  
+  <select id="getPrivMenu" resultClass="hashmap" parameterClass="map">
+    SELECT distinct a.MENU_ID CODE, a.PARENT_ID P_CODE, b.RES_NA NAME, a.ORD_INDEX
+					FROM AS_MENU a, AS_LANG_TRANS b, V_AS_MENU_COMPO c
+					WHERE a.MENU_ID=b.RES_ID AND b.LANG_ID='C' AND c.MENU_ID LIKE a.MENU_ID || '%'
+								and c.compo_id in
+								(select compo_id from v_as_usr_func where user_id = #svUserID#	
+								union
+								select x.compo_id 
+											from v_as_role_func x, as_posi_role z, as_emp gg, as_emp_position hh
+											where gg.emp_code=hh.emp_code and hh.posi_code=z.posi_code
+														and z.role_id=x.role_id and gg.user_id = #svUserID#
+								)
+					order by a.ord_index
+  </select>
+  <select id="getUserNumLimList" resultClass="hashmap" parameterClass="map">
+  	select CTRL_FIELD,GRAN_RANGE,REVO_RANGE,IS_GRAN from as_user_num_lim 
+  	       where USER_ID = #USER_ID# and FUNC_ID = #FUNC_ID# and COMPO_ID = #COMPO_ID#
+  	<dynamic prepend="">
+			<isNotNull prepend="AND" property="CTRL_FIELD">
+  			CTRL_FIELD = #CTRL_FIELD#
+  		</isNotNull> 	   
+		</dynamic>	       
+  </select>
+  <select id="getRoleNumLimList" resultClass="hashmap" parameterClass="map">
+  	select CTRL_FIELD, GRAN_RANGE, REVO_RANGE, IS_GRAN from AS_ROLE_NUM_LIM 
+  				 where ROLE_ID = #ROLE_ID# and FUNC_ID = #FUNC_ID# and COMPO_ID = #COMPO_ID#
+  </select>
+  <select id="getRoleNumLimListByUserId" resultClass="hashmap" parameterClass="map">
+  	select rn.CTRL_FIELD, rn.GRAN_RANGE, rn.REVO_RANGE, rn.IS_GRAN 
+  		from as_role_num_lim rn, as_emp_role er, as_emp ae 
+  	    where ae.USER_ID = #USER_ID# and rn.FUNC_ID = #FUNC_ID# 
+  	    	and rn.COMPO_ID = #COMPO_ID# and rn.role_id = er.role_id and ae.emp_code = er.emp_code
+  	<dynamic prepend="">
+			<isNotNull prepend="AND" property="CTRL_FIELD">
+  			rn.CTRL_FIELD = #CTRL_FIELD#
+  		</isNotNull> 	   
+		</dynamic>	       
+    UNION 
+      select rn.CTRL_FIELD, rn.GRAN_RANGE, rn.REVO_RANGE, rn.IS_GRAN 
+             from as_role_num_lim rn, as_emp er, AS_EMP_POSITION d, AS_POSI_ROLE e
+      where rn.role_id = e.role_id and e.posi_code = d.posi_code and er.emp_code = d.emp_code	
+             and er.USER_ID = #USER_ID# and rn.FUNC_ID = #FUNC_ID#  and rn.COMPO_ID = #COMPO_ID#	
+  	<dynamic prepend="">
+			<isNotNull prepend="AND" property="CTRL_FIELD">
+  			rn.CTRL_FIELD = #CTRL_FIELD#
+  		</isNotNull> 	   
+		</dynamic>			
+  </select>
+  
+  <!-- group page designer-->
+  <select id="selectCompo" resultClass="hashmap" parameterClass="java.lang.String">
+    select distinct am.compo_id as COMPO_ID, ac.res_na as COMPO_NAME, am.url as COMPO_URL 
+    	from as_menu_compo am, as_lang_trans ac
+  		where am.compo_id = ac.res_id
+  		<dynamic prepend="">
+	  		<isNotNull prepend="AND" property="compo_id">
+					am.compo_id like #compo_id#
+	 		 	</isNotNull>
+			</dynamic>
+		order by am.compo_id    
+  </select>
+      
+  <insert id="insertPage" parameterClass="page">
+	insert into ap_group_page(group_id, page_id, page_title, page_order) 
+	       values(#groupId#, #titleId#, #titleName#, #index#)
+  </insert>
+  
+  <delete id="deletePage" parameterClass="page">
+  	delete from ap_group_page where page_id = #titleId# 
+  	<dynamic>
+	  <isNotNull prepend="AND" property="groupId">
+		group_id = #groupId#
+	  </isNotNull>
+	</dynamic>		
+  </delete>
+
+  <update id="updatePage" parameterClass="page">
+	update ap_group_page
+	<dynamic prepend="set">
+	  <isNotNull prepend="," property="titleName">
+		page_title = #titleName#
+	  </isNotNull>
+	  <isNotNull prepend="," property="index">
+		page_order = #index#
+	  </isNotNull>	  
+	</dynamic>
+	where page_id = #titleId# 
+  	<dynamic>
+	  <isNotNull prepend="AND" property="groupId">
+		group_id = #groupId#
+	  </isNotNull>
+	</dynamic>			
+  </update>
+
+  <insert id="insertMenu" parameterClass="apMenu">
+	insert into ap_menu(menu_id, menu_name, parent_id, ord_index) 
+	       values(#code#, #name#, #parent.code#, #index#)
+  </insert>
+  
+  <delete id="deleteMenu" parameterClass="apMenu">
+  	delete from ap_menu where menu_id = #code# 		
+  </delete>
+
+  <update id="updateMenu" parameterClass="apMenu">
+  	update ap_menu set menu_name = #name# where menu_id = #code# 		
+  </update>
+
+  <insert id="insertMenuCompo" parameterClass="apCompo">
+	insert into ap_menu_compo(menu_id, compo_id, compo_name, ord_index, is_goto_edit, is_always_new, url, is_in_menu) 
+	       values(#parent.code#, #code#, #name#, #index#, #isGotoEdit#, #isAlwaysNew#, #url#, #isInMenu#)
+  </insert>
+  
+  <delete id="deleteMenuCompo" parameterClass="apCompo">
+  	delete from ap_menu_compo where menu_id = #parent.code# and compo_id = #code#		
+  </delete>
+
+  <update id="updateMenuCompo" parameterClass="apCompo">
+  	update ap_menu_compo 
+  		set compo_name = #name#
+  		, is_goto_edit = #isGotoEdit#
+  		, is_always_new = #isAlwaysNew#
+  		, url = #url#
+  		, is_in_menu = #isInMenu# 
+  		where menu_id = #parent.code# 	and compo_id = #code#	
+  </update>
+  
+  <delete id="deleteMenuCompoWithMenu" parameterClass="java.lang.String">
+  	delete from ap_menu_compo 
+ 		where ap_menu_compo.MENU_ID in 
+ 			(select menu_id from ap_menu menu
+            	where menu.parent_id in (select menu_id from ap_menu where parent_id = #code#) 
+                	  or menu.parent_id = #code#)
+            or ap_menu_compo.menu_id = #code#		
+  </delete>
+  
+  <delete id="deleteMenuWithPage" parameterClass="java.lang.String">
+  	delete from ap_menu 
+  		where ap_menu.parent_id in (select menu_id from ap_menu where parent_id = #code# ) 
+         	  or ap_menu.parent_id = #code# or ap_menu.menu_id = #code# 		
+  </delete>
+    
+  <select id="selectCompoStyle" resultClass="hashmap" parameterClass="java.lang.String">
+    select distinct alt.res_id as RES_ID, alt.res_na as RES_NA from as_lang_trans alt, as_product_ver apv
+ 				where alt.res_id = apv.product_code
+   					and apv.product_code != 'style'
+   					and apv.product_code != 'WFDesigner'
+   					and apv.product_code != 'admin'
+   					order by res_id 
+  </select>
+  
+  <select id="selectUserFunc" resultClass="java.lang.String" parameterClass="map">
+    select func_id from as_func where upper(is_grant_to_all) = 'Y'
+	union all
+	select func_id from as_user_func where user_id = #userId# and compo_id = #compoId#
+	union all 
+	select b.func_id from AS_COMPO_FUNC b, AS_COMPO c
+		WHERE upper(c.IS_GRANT_TO_ALL) = 'Y' AND b.COMPO_ID = c.COMPO_ID
+			and c.COMPO_ID = #compoId#
+	union all
+	SELECT b.FUNC_ID FROM AS_ROLE_FUNC b, AS_EMP c, AS_EMP_ROLE d
+		WHERE c.EMP_CODE = d.EMP_CODE AND d.ROLE_ID = b.ROLE_ID 
+			and c.user_id = #userId# and b.compo_id = #compoId#       
+	union  all 
+	select b.func_id from AS_ROLE_FUNC b, AS_EMP c, AS_EMP_POSITION d, AS_POSI_ROLE e 
+		where b.role_id = e.role_id and d.emp_code = c.emp_code and d.posi_code = e.posi_code
+			and c.user_id = #userId# and b.compo_id = #compoId# 
+			and ((d.co_code = #coCode#) or (d.co_code in (select d.co_code from rp_company d where d.rp_code = #coCode#))) 
+ 			and d.org_code = #orgCode# and d.posi_code = #posiCode# 
+  </select>
+  
+  <select id="selectUserFuncBySa" resultClass="java.lang.String" parameterClass="map">
+    select func_id from as_func 
+  </select>
+  
+    <select id="checkSaRoleByPosi" resultClass="java.lang.Integer" parameterClass="java.lang.String">
+  		select count(1) from AS_POSI_ROLE e where e.role_id = 'sa' and e.POSI_CODE = #posiCode#
+  </select> 
+    
+</sqlMap>

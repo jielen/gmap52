@@ -1,0 +1,227 @@
+<!DOCTYPE xwork PUBLIC
+    "-//OpenSymphony Group//XWork 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-1.0.dtd"
+ >
+
+<xwork>
+	<package name="xwork-gmap" extends="webwork-default">
+
+		<interceptors>
+		  <interceptor name="sessionValidate" class="com.anyi.gp.interceptor.SessionInterceptor"/>
+		  <interceptor name="logger" class="com.anyi.gp.interceptor.LoggingInterceptor"/>
+		  <interceptor name="parameter" class="com.anyi.gp.interceptor.ParameterInterceptor"/>
+		  <interceptor name="license" class="com.anyi.gp.interceptor.LicenseInterceptor"/>
+		  <interceptor name="sessionCheck" class="com.anyi.gp.interceptor.SessionCheckInterceptor" /> 
+		  <interceptor name="ipFilter" class="com.anyi.gp.interceptor.IpFilterInterceptor"/>
+		  
+    	<interceptor-stack name="gmap-basicStack">
+    	  <interceptor-ref name="sessionValidate"/>
+    	  <interceptor-ref name="logger"/>
+    	  <interceptor-ref name="parameter"/>
+      	  <interceptor-ref name="basicStack"/>
+      </interceptor-stack>
+    </interceptors>
+    		
+		<default-interceptor-ref name="gmap-basicStack"/>
+		            	
+		<action name="getselectpagedata" class="selectPageAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="getlistpagedata" class="listPageAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="geteditpagedata" class="editPageAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>		
+		<action name="getschemastatus" class="getSchemaStatusAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="saveschema" class="saveSchemaAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="loadschema" class="loadSchemaAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="deleteschema" class="deleteSchemaAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="saveGridProp" class="savePropAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="deleteGridProp" class="deletePropAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="getGridHeadTable" class="getGridHeadTable">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="addItem" class="addItemAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="save" class="save">
+			<result name="success" type="stream">
+		</result>
+		</action>
+		<action name="getPrivTree" class="getPrivTreeAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="savePriv" class="savePrivAction">
+			<result name="success" type="dispatcher">/jsp/platform/information.jsp
+			</result>			
+		</action>
+		<action name="queryGrantByGrantedUser" class="queryGrant">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="saveSession" class="saveSession">
+			<result name="success" type="stream"></result>			
+		</action>
+		<action name="getMenuTree" class="getMenuTree">
+			<result name="success" type="stream"></result>			
+		</action>				
+		<action name="savePassword" class="savePassword">
+			<result name="success" type="dispatcher">/jsp/platform/finish.jsp</result>
+			<result name="error" type="dispatcher">/jsp/platform/passwd.jsp</result>
+			<result name="reset_error" type="dispatcher">/jsp/platform/resetPsd.jsp</result>			
+		</action>						
+	    <action name="login" class="loginAction">
+	      <result name="input">/index.jsp</result>
+	      <interceptor-ref name="parameter"/>
+	      <interceptor-ref name="sessionCheck" /> 
+	      <interceptor-ref name="basicStack"/>
+	    </action>
+	    <action name="loginDispatcher" class="dispatcherAction">
+	      <result name="input">/index.jsp</result>
+	      <result name="success">/mainFrame.jsp</result>
+	      <result name="resource">/LocalResourceProcessor.jsp</result>
+	      <interceptor-ref name="ipFilter"/>
+	      <interceptor-ref name="license"/>
+	      <interceptor-ref name="parameter"/>
+	      <interceptor-ref name="basicStack"/>
+	    </action>
+	    <action name="getOptions" class="getOptions">    	
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="fileUpload" class="fileUploadAction">		
+			<interceptor-ref name="fileUploadStack" />
+		</action>			
+		<action name="fileDownload" class="fileDownloadAction">
+			<interceptor-ref name="basicStack"/>					
+		</action>		
+		<action name="fileDelete" class="fileDeleteAction">
+			<result name="success" type="stream"></result>			
+		</action>
+		<action name="getruledelta" class="getRuleDeltaAction">
+			<result name="success" type="stream"></result>	
+			<interceptor-ref name="basicStack"/>		
+		</action>
+		<action name="getruledata" class="getRuleDataAction">
+			<result name="success" type="stream"></result>	
+			<interceptor-ref name="basicStack"/>		
+		</action>
+		<action name="psdModiTime" class="psdModiTimeAction">
+		  <result name="success" type="stream"></result>			
+		</action>
+		<action name="logout" class="logoutAction">
+		  <result name="success" type="stream"></result>
+		  <interceptor-ref name="basicStack"/>			
+		</action>	
+		<action name="getlantrans" class="getLanTransAction">
+		  <result name="success" type="stream"></result>			
+		</action>
+		<action name="saveOpt" class="saveOptions">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="saveNumPriv" class="saveNumPrivAction">
+			<result name="success" type="dispatcher">/jsp/platform/information.jsp
+			</result>			
+		</action>
+		<action name="roleCopy" class="roleCopyAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="empCopy" class="empCopyAction">
+			<result name="success" type="stream">
+			</result>			
+		</action>
+		<action name="getTreeRowSet" class="getTreeRowSet">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="getDigest" class="getDigestAction">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="uploadLicense" class="uploadLicense">
+			<result name="success" type="stream">
+			</result>
+		</action>		
+		<action name="exportExcelData" class="exportExcelData">
+			<result name="success" type="dispatcher">/jsp/platform/exportExcel.jsp
+			</result>
+		</action>		
+		<action name="getTopMenu" class="getTopMenuAction">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="updateGroupPage" class="updateGroupPageAction">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="updateMenuTree" class="updateMenuTreeAction">
+			<result name="success" type="stream">
+			</result>
+		</action>	
+		<action name="exportToReport" class="exportToReport">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="publishView" class="publishView">
+			<interceptor-ref name="basicStack"/>
+		</action>
+		<action name="download" class="download">
+			<interceptor-ref name="basicStack"/>
+		</action>
+		<action name="resourceUpload" class="resourceUploadAction">		
+			<interceptor-ref name="fileUploadStack" />
+		</action>
+		<action name="expMenuInfo" class="expMenuInfoAction">
+			<result name="success" type="stream">
+		    </result>
+		</action>
+		<action name="impMenuInfo" class="impMenuInfoAction">
+			<result name="success" type="stream">
+		    </result>
+		</action>
+		<action name="checkRegister" class="checkRegisterAction">
+			<result name="success" type="stream">
+		    </result>
+		</action>
+		<action name="groupCopy" class="groupCopyAction">
+			<result name="success" type="stream">
+		    </result>
+		</action>
+		<action name="createKey" class="createKeyAction">
+			<result name="success" type="dispatcher">/jsp/platform/download.jsp
+			</result>
+			<interceptor-ref name="basicStack"/>				
+		</action>
+		<action name="getPeriod" class="getPeriodAction">
+			<result name="success" type="stream">
+		    </result>
+		</action>											
+	</package>	
+</xwork>

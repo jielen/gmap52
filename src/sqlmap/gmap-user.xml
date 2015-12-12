@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.2//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gmap-user">
+  <typeAlias alias="user" type="com.anyi.gp.domain.User" />
+  <typeAlias alias="group" type="com.anyi.gp.domain.Group" />
+  
+  <resultMap id="getUserResult" class="user">
+    <result property="userCode" column="USER_ID"/>
+    <result property="userName" column="USER_NAME" nullValue=""/>
+    <result property="password" column="PASSWD" nullValue=""/>
+    <result property="groupList" column="USER_ID" select="gmap-user.getGroupListByUser" />
+  </resultMap>
+  
+  <resultMap id="getUserGroupsResult" class="group" >
+    <result property="id" column="GROUP_ID"/>
+    <result property="groupName" column="GROUP_NAME" />
+  </resultMap>
+  
+  <select id="getUserById" resultMap="getUserResult" parameterClass="java.lang.String">
+    select au.* from AS_USER au, AS_EMP ae where au.USER_ID = #USER_ID#
+    	and au.user_id = ae.user_id and ae.IS_LOGIN = 'Y' 
+  </select>
+  
+  <select id="getGroupListByUser" resultMap="getUserGroupsResult" parameterClass="java.lang.String">
+    select distinct ug.group_id as GROUP_ID, ag.group_name as GROUP_NAME
+           from v_as_user_group ug, as_group ag 
+    where ug.group_id = ag.GROUP_ID  and USER_ID = #USER_ID# and ug.group_id != 'guest'
+  </select>
+  
+  <select id="getSessionContextByUser" resultClass="hashmap" parameterClass="java.lang.String">
+    select SESSION_KEY ,SESSION_VALUE  from as_user_session where USER_ID = #USER_ID#
+  </select>
+</sqlMap>

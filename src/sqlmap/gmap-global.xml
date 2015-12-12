@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.2//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gmap-global">
+
+  <select id="GET_OPT_RP_ITEM_05" resultClass="hashmap" parameterClass="map">
+	SELECT OPT_VAL FROM AS_OPTION where OPT_ID = #OPT_ID#
+	<dynamic>
+	  <isNotNull prepend="AND" property="cocode">
+		CO_CODE = #cocode#
+	  </isNotNull>
+	</dynamic>
+  </select>
+  <select id="getDataFromAS_COMPANY" resultClass="hashmap" parameterClass="map">
+  	select * from AS_COMPANY MASTER
+  	<dynamic prepend="WHERE">
+  		<isNotNull prepend="AND" property="temp">
+  			MASTER.CO_CODE in (select distinct AS_EMP_POSITION.CO_CODE from 
+           AS_EMP_POSITION where AS_EMP_POSITION.EMP_CODE=#temp# and AS_EMP_POSITION.ND=#nd#)
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="nd">
+  			 MASTER.ND = #nd#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="matchCond">
+  			(MASTER.CO_CODE like #matchCond# or MASTER.CO_NAME like #matchCond#)
+  		</isNotNull>
+  	</dynamic>
+  	order by MASTER.CO_CODE
+  </select>
+  <select id="getDataFromSELECT_AS_ORG" resultClass="hashmap" parameterClass="map">
+  	select MASTER.*, AC.CO_NAME from AS_ORG MASTER, AS_COMPANY AC
+  	where MASTER.co_code = AC.co_code and MASTER.nd = AC.nd
+  	<dynamic prepend="">
+  		<isNotNull prepend="AND" property="coCode">
+  			MASTER.CO_CODE = #coCode#
+  		</isNotNull> 
+      <isNotNull prepend="AND" property="temp"> 
+       	MASTER.ORG_CODE in (select distinct AS_EMP_POSITION.ORG_CODE from
+      		AS_EMP_POSITION where
+      		AS_EMP_POSITION.EMP_CODE=#temp# and AS_EMP_POSITION.CO_CODE= #coCode#)
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="nd">
+  			MASTER.ND =#nd#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="matchCond">
+  			(MASTER.CO_CODE like #matchCond# or MASTER.ORG_CODE like #matchCond# or MASTER.ORG_NAME like #matchCond#)
+  		</isNotNull>
+  	</dynamic>
+  </select>
+  <select id="getDataFromV_AS_ORG_POSITION" resultClass="hashmap" parameterClass="map">
+  	select * from V_AS_ORG_POSITION MASTER
+  	<dynamic prepend="WHERE">
+  		<isNotNull prepend="AND" property="coCode">
+  			MASTER.CO_CODE = #coCode#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="orgCode">
+  			MASTER.ORG_CODE= #orgCode#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="nd">
+  			MASTER.ND =#nd#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="userId">
+  			MASTER.POSI_CODE IN (select T1.POSI_CODE
+  					from as_emp_position T1,AS_EMP T2 WHERE T1.EMP_CODE=T2.EMP_CODE 
+  					AND T2.USER_ID=#userId# and T1.co_code=#coCode# 
+  					<isNotNull prepend="AND" property="orgCode">
+  						T1.ORG_CODE=#orgCode#
+  					</isNotNull>
+  					<isNotNull prepend="AND" property="nd">
+  						T1.nd=#nd#
+  					</isNotNull>
+  					)
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="matchCond">
+  			(MASTER.CO_CODE like #matchCond# or MASTER.ORG_CODE like #matchCond# or MASTER.CO_NAME like #matchCond# or MASTER.ORG_NAME like #matchCond# or MASTER.POSI_CODE like #matchCond# or MASTER.POSI_NAME like #matchCond#)
+  		</isNotNull>
+  	</dynamic>  	
+  </select>
+  <select id="getDataFromMA_CO_ACC" resultClass="hashmap" parameterClass="map">
+  	select MASTER.*, mc.CO_NAME, coa.COA_NAME from MA_CO_ACC MASTER, MA_COMPANY mc, MA_COA coa 
+  		where MASTER.IS_USED='Y' and MASTER.co_code = mc.co_code and MASTER.nd = mc.nd
+  		and MASTER.nd = coa.FISCAL and MASTER.COA_CODE = coa.COA_CODE
+  	<dynamic prepend="">
+  		<isNotNull prepend="AND" property="coCode">
+  			MASTER.CO_CODE = #coCode#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="nd">
+  			MASTER.ND =#nd#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="matchCond">
+  			(MASTER.CO_CODE like #matchCond# or MASTER.ACCOUNT_NAME like #matchCond#)
+  		</isNotNull>
+  	</dynamic>
+  </select>
+  <select id="getDataFromRP_COMPANY" resultClass="hashmap" parameterClass="map">
+  	select * from RP_COMPANY MASTER
+  	<dynamic prepend="where">
+  		<isNotNull prepend="AND" property="CO_CODE">
+  			CO_CODE = #CO_CODE#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="ND">
+  			ND = #ND#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="RP_CODE">
+  			RP_CODE = #RP_CODE#
+  		</isNotNull>  		
+  		<isNotNull prepend="AND" property="matchCond">
+  			(CO_CODE like #matchCond# or CO_NAME like #matchCond#
+  	 or RP_CODE like #matchCond# or RP_NAME like #matchCond#)
+  		</isNotNull>
+  	</dynamic>
+  </select>	
+  <select id="getDataFromAS_USER_GRANT" resultClass="hashmap" parameterClass="map">
+  	select * from AS_USER_GRANT MASTER
+  	<dynamic prepend="where">
+  		<isNotNull prepend="AND" property="GRANTED_USER">
+  			GRANTED_USER = #GRANTED_USER#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="GRANT_USER">
+  			GRANT_USER = #GRANT_USER#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="GRANT_START_DATE">
+  			(#GRANT_START_DATE# => GRANT_START_DATE or GRANT_START_DATE= NULL or GRANT_START_DATE='')
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="GRANT_END_DATE">
+  			(GRANT_END_DATE > GRANT_END_DATE or GRANT_END_DATE= NULL or GRANT_END_DATE='')
+  		</isNotNull>  		  		
+  		<isNotNull prepend="AND" property="matchCond">
+  			GRANTED_USER like #matchCond# or GRANT_USER like #matchCond#
+  		</isNotNull>
+  	</dynamic>  	
+  </select>
+  <select id="getDataFromRP_RPT_TYPE" resultClass="hashmap" parameterClass="map">
+  	select * from RP_RPT_TYPE MASTER
+  	<dynamic prepend="where">
+  		<isNotNull prepend="AND" property="RP_TYPE_CODE">
+  			RP_TYPE_CODE = #RP_TYPE_CODE#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="RP_TYPE_NAME">
+  			RP_TYPE_NAME = #RP_TYPE_NAME#
+  		</isNotNull>  		  		
+  		<isNotNull prepend="AND" property="matchCond">
+  			RP_TYPE_CODE like #matchCond# or RP_TYPE_NAME like #matchCond# or MEMO like #matchCond#
+  		</isNotNull>
+  	</dynamic>  	
+  </select>
+  <select id="getDataAS_GET_GLOBAL_RPCODE" resultClass="hashmap" parameterClass="map">
+  	select MASTER.RP_CODE,MASTER.RP_NAME from RP_COMPANY MASTER
+  				 where (MASTER.CO_CODE=#CO_CODE# and MASTER.ND=#ND#) 
+  							 and (select count(RP_COMPANY.RP_CODE) 
+  										from RP_COMPANY 
+  										where (RP_COMPANY.CO_CODE=#CO_CODE# and RP_COMPANY.ND=#ND#))=1  	
+  </select>      
+</sqlMap>

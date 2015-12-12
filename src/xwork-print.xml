@@ -1,0 +1,64 @@
+<!DOCTYPE xwork PUBLIC
+    "-//OpenSymphony Group//XWork 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-1.0.dtd"
+ >
+ 
+<xwork>
+	<package name="xwork-print" extends="xwork-gmap">
+	
+		<action name="getPSParameter" class="getPSParameter">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		
+		<action name="compoTplInfo" class="compoTplInfo">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		
+		<action name="setPSParameter" class="setPSParameter">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		
+		<action name="getTextDataFromFile" class="getTextDataFromFile">
+			<result name="success" type="stream">
+			</result>
+			<interceptor-ref name="basicStack" />
+		</action>
+		
+		<action name="setJasperTextData" class="setJasperTextData">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		
+		<action name="savePrintTemplate" class="savePrintTemplate">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		
+		<action name="jrPrint" class="jrPrint">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="jrPrintPrinter" class="jrPrintPrinter">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="jrPrintPreview" class="jrPrintPreview">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		<action name="jrPrintDirect" class="jrPrintDirect">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		
+		<action name="prnTempDist" class="prnTempDist">
+			<result name="success" type="stream">
+			</result>
+		</action>
+		
+	</package>
+</xwork>
+ 

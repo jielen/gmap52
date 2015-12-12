@@ -1,0 +1,16 @@
+<!DOCTYPE xwork PUBLIC
+    "-//OpenSymphony Group//XWork 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-1.0.dtd"
+ >
+ <!-- "file:///temp/ross/xwork/src/etc/xwork-1.0.dtd"  -->
+
+<xwork>
+  <include file="webwork-default.xml"/>
+  <include file="xwork-gmap.xml"/>   
+  <include file="xwork-workflow.xml"/>
+  <include file="xwork-print.xml"/>
+  <include file="sys-dispatcher.xml"/>
+  
+  <!-- for test -->
+  <include file="xwork-test.xml"/>  
+</xwork>    

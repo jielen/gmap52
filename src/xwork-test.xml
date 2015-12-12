@@ -1,0 +1,17 @@
+<!DOCTYPE xwork PUBLIC
+    "-//OpenSymphony Group//XWork 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-1.0.dtd"
+ >
+
+<!-- for test -->
+<xwork>
+	<package name="test" extends="webwork-default">
+		<action name="getpage_AM_WFTEST" class="pageDispatcherAction">
+			<interceptor-ref name="basicStack" />
+			<result name="list" type="dispatcher">/jsp/test/AM_WFTEST_List.jsp</result>
+			<result name="edit" type="dispatcher">/jsp/test/AM_WFTEST_Edit.jsp</result>			
+			<result name="error" type="redirect">error.jsp</result>
+		</action>		
+	</package>
+	<!-- -->
+</xwork>

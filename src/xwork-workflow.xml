@@ -1,0 +1,174 @@
+<!DOCTYPE xwork PUBLIC
+    "-//OpenSymphony Group//XWork 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-1.0.dtd"
+ >
+
+<xwork>
+	<package name="xwork-wf" extends="xwork-gmap">
+
+		<interceptors>
+		  <interceptor name="workList" class="com.anyi.gp.workflow.interceptor.WorklistInterceptor"/> 		  
+    	</interceptors>
+    	
+		<action name="wfNewCommit" class="wfNewCommit">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="insertWithWorkflow" class="insertWithWorkflow">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="updateWithWorkflow" class="updateWithWorkflow">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="commit" class="commit">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="deleteWithWorkflow" class="deleteWithWorkflow">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="deleteDraftAndEntity"
+			class="deleteDraftAndEntity">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="getWfdataByProcessInstId"
+			class="getWfdataByProcessInstId">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="getListPage" class="getListPage">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="rework" class="rework">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="untreadSimply" class="untreadSimply">
+			<result name="success" type="stream"></result>
+		</action>
+		
+		<action name="deleteDraftAndEntity" class="deleteDraftAndEntity">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<!-- 简单提交用action -->
+		<action name="commitSimply" class="commitSimply">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<!-- 手动提交用action -->
+		<action name="wfCommon" class="wfCommon">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<!-- 查询工作流状态用acion -->
+		<action name="queryWFState" class="queryWFState">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="queryPreviousNodePageData"
+			class="queryPreviousNodePageData">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="queryPreviousNodePageDataByNode"
+			class="queryPreviousNodePageDataByNode">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="queryPreviousNodeFieldListValue"
+			class="queryPreviousNodeFieldListValue">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="updateWFData" class="updateWFData">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="queryCompoEnableStartedTempate"
+			class="queryCompoEnableStartedTempate">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="queryDefaultActionName"
+			class="queryDefaultActionName">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="queryDefaultNextExecutor"
+			class="queryDefaultNextExecutor">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="getExecutorsByRelation"
+			class="getExecutorsByRelation">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="queryInstanceStatus"
+			class="queryInstanceStatus">
+			<result name="success" type="stream"></result>
+		</action>
+
+		<action name="collectCommit" class="collectCommit">
+			<result name="success" type="stream"></result>
+		</action>
+		
+		<action name="interruptInstance" class="interruptInstance">
+			<result name="success" type="stream"></result>
+		</action>
+		<action name="getFirstNode" class="getFirstNode">
+			<result name="success" type="stream"></result>
+		</action>
+		<action name="getRuntimeExecutor" class="getRuntimeExecutor">
+			<result name="success" type="stream"></result>
+		</action>
+		<action name="getNodeExecutorBySource" class="getNodeExecutorBySource">
+			<result name="success" type="stream"></result>
+		</action>
+		<action name="removeNextNodeExecutor" class="removeNextNodeExecutorAction">
+			<result name="success" type="stream"></result>
+		</action>
+		<action name="removeNodeExecutor" class="removeNodeExecutorAction">
+			<result name="success" type="stream"></result>
+		</action>
+		<action name="appendExecutor" class="appendExecutorAction">
+			<result name="success" type="stream"></result>
+		</action>		
+		<!-- instance trace -->
+		<action name="wfInstanceTrace" class="wfInstanceTrace">
+			<result name="success" type="dispatcher">
+				/jsp/wf/WF_TracePage.jsp
+			</result>
+			<result name="error" type="redirect">/error.jsp</result>
+		</action>
+		<!-- my done job -->
+		<action name="getpage_WF_WORKLIST_DONE" class="pageDispatcherAction">
+			<result name="list" type="dispatcher">/jsp/wf/WF_WORKLIST_DONE.jsp</result>
+			<result name="error" type="redirect">/error.jsp</result>
+		</action>
+
+		<!-- my todo job -->
+		<action name="getpage_WF_WORKLIST_TODO" class="pageDispatcherAction">
+			<result name="list" type="dispatcher">/jsp/wf/WF_WORKLIST_TODO.jsp</result>
+			<result name="error" type="redirect">/error.jsp</result>
+		</action>
+
+		<!-- my draft job -->
+		<action name="getpage_WF_DRAFT" class="pageDispatcherAction">
+			<result name="list" type="dispatcher">/jsp/wf/WF_DRAFT_LIST.jsp</result>
+			<result name="error" type="redirect">/error.jsp</result>
+		</action>
+		
+		<action name="getWorklist" class="getWorklistAction">
+			<interceptor-ref name="gmap-basicStack"/>
+			<interceptor-ref name="workList" />
+		</action>
+		
+	</package>
+</xwork>

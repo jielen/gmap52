@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.2//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="print-ruleData">
+
+	<select id="AS_GET_PRINT_JASPERTEMP" resultClass="hashmap" parameterClass="map">
+		SELECT PRN_COMPO_ID,PRN_TPL_JPCODE,PRN_TPL_NAME,PRN_TPL_REPORTTYPE,PRN_TPL_FIXROWCOUNT,PRN_TPL_OUTTYPE from AS_PRINT_JASPERTEMP 
+		<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="componame">
+				PRN_COMPO_ID = #componame#
+			</isNotNull>
+			<isNotEmpty prepend="AND" property="tplCode">
+				PRN_TPL_JPCODE = #tplCode#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="reportType">
+				(PRN_TPL_REPORTTYPE LIKE #reportType# OR PRN_TPL_REPORTTYPE LIKE '%C')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="AS_GET_PRINT_JASPERLISTTEMP" resultClass="hashmap" parameterClass="map">
+		SELECT PRN_COMPO_ID,PRN_TPL_JPCODE,PRN_TPL_NAME,PRN_TPL_REPORTTYPE,PRN_TPL_FIXROWCOUNT,PRN_TPL_OUTTYPE from AS_PRINT_JASPERTEMP 
+		where prn_compo_id = #componame# AND PRN_TPL_JPCODE = #tplCode# AND PRN_TPL_REPORTTYPE LIKE '%L'
+	</select>
+	<select id="AS_GET_EDITPAGEFIELDS" resultClass="hashmap" parameterClass="map">
+		SELECT DISTINCT F.FIELD_NAME,(SELECT RES_NA  FROM AS_LANG_TRANS WHERE F.FIELD_NAME = AS_LANG_TRANS.RES_ID) AS RES_NA,
+			F.ORD_INDEX FROM AS_PAGE_AREA_FIELD F, AS_PAGE_AREA A, AS_COMPO C WHERE F.PAGE_ID = #pagename# AND 
+			F.IS_VISIBLE IN ('Y','y') AND F.AREA_ID = A.AREA_ID AND F.PAGE_ID = A.PAGE_ID AND 
+			A.TABLE_ID = C.MASTER_TAB_ID AND C.COMPO_ID = #componame# ORDER BY ORD_INDEX
+	</select>
+	<select id="AS_GET_LISTPAGEFIELDS" resultClass="hashmap" parameterClass="map">
+		SELECT C.DATA_ITEM,(SELECT RES_NA FROM AS_LANG_TRANS WHERE C.DATA_ITEM = AS_LANG_TRANS.RES_ID) AS RES_NA,
+			C.ORD_INDEX FROM AS_TAB_COL C WHERE C.TAB_ID = #tablename# 
+			AND C.IS_LIST IN ('Y','y') ORDER BY ORD_INDEX,DATA_ITEM
+	</select>
+	<select id="AS_COMPO_MASTER_TAB" resultClass="hashmap" parameterClass="map">
+		SELECT b.TAB_ID FROM AS_COMPO a,AS_TABLE b where  b.tab_id=a.master_tab_id and a.compo_id=#compo_id#
+	</select>
+	<select id="AS_COMPO_FIELD" resultClass="hashmap" parameterClass="map">
+		SELECT DISTINCT c.DATA_ITEM, d.RES_NA AS DATA_ITEM_NA, ' ' AS TAB_NA FROM AS_COMPO a, AS_TABLE b, AS_TAB_COL c, AS_LANG_TRANS d 
+		WHERE b.master_tab_id = a.master_tab_id AND c.tab_id = b.tab_id AND c.DATA_ITEM = d.RES_ID AND a.compo_id = #compo_id#
+	</select>
+	<select id="AS_COMPO_FIELD_NO_AS_TABLE" resultClass="hashmap" parameterClass="map">
+		SELECT c.DATA_ITEM, d.RES_NA, ' ' AS BLANK FROM AS_COMPO a,AS_TAB_COL c, AS_LANG_TRANS d 
+		WHERE a.master_tab_id = c.tab_id AND c.DATA_ITEM = d.RES_ID AND a.compo_id = #compo_id#
+	</select>
+	<select id="AS_GET_PRINT_TEMPINFO" resultClass="hashmap" parameterClass="map">
+		SELECT DISTINCT PRN_TPL_JPCODE, PRN_TPL_NAME FROM AS_PRINT_JASPERTEMP
+		<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="CO_CODE">
+				CO_CODE = #CO_CODE#
+			</isNotNull>
+			<isNull prepend="AND" property="CO_CODE">
+				CO_CODE = '*'
+			</isNull>
+		</dynamic>
+		ORDER BY PRN_TPL_JPCODE desc
+	</select>
+</sqlMap>

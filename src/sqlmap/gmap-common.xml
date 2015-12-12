@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gmap-common">
+	
+	<typeAlias alias="searchSchema" type="com.anyi.gp.core.bean.SearchSchema"/>
+	<typeAlias alias="funcBean" type="com.anyi.gp.bean.FuncBean"/>
+    <typeAlias alias="optionBean" type="com.anyi.gp.bean.OptionBean"/>
+    <typeAlias alias="valSetBean" type="com.anyi.gp.bean.ValSetBean"/>
+    <typeAlias alias="valBean" type="com.anyi.gp.bean.ValBean"/>
+	<typeAlias alias="AsFile" type="com.anyi.gp.core.bean.AsFile"/>   
+    <typeAlias alias="group" type="com.anyi.gp.domain.Group" />
+    <typeAlias alias="license" type="com.anyi.gp.license.License" />
+    
+  <resultMap id="GroupsResult" class="group" >
+    <result property="id" column="GROUP_ID"/>
+    <result property="groupName" column="GROUP_NAME" />
+  </resultMap>
+       
+  <resultMap id="AsFileResult" class="AsFile">   
+    <result property="fileId" column="FILE_ID"/>   
+    <result property="fileName" column="FULL_NAME"/>   
+    <result property="fileContentType" column="SUFFIX_NAME"/>   
+    <result property="fileContent" column="FILE_CONTENT"   
+            typeHandler="org.springframework.orm.ibatis.support.BlobByteArrayTypeHandler"/>   
+  </resultMap>
+	<resultMap id="get-funcBean" class="funcBean">
+	  <result property="funcId" column="FUNC_ID" />
+	  <result property="funcDesc" column="FUNC_DESC" />
+	  <result property="ordIndex" column="ORD_INDEX" />
+	  <result property="isGrantToAll" column="IS_GRANT_TO_ALL" />
+	  <result property="shortCutKey" column="SHORTCUT_KEY" />
+	  <result property="isCtrl" column="IS_CTRL" nullValue=""/>
+	  <result property="isShift" column="IS_SHIFT" nullValue=""/>
+	  <result property="isAlt" column="IS_ALT" nullValue=""/>
+	</resultMap>
+  <resultMap id="get-option" class="optionBean">
+		<result property="optId" column="OPT_ID" />
+		<result property="coCode" column="CO_CODE"  />
+		<result property="compoId" column="COMPO_ID" />
+		<result property="transType" column="TRANS_TYPE" />
+		<result property="optVal" column="OPT_VAL" nullValue=""/>
+		<result property="systemOpt" column="IS_SYST_OPT" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>		
+	</resultMap>
+	<resultMap id="get-valSet" class="valSetBean">
+		<result property="valSetId" column="VALSET_ID" />
+		<result property="valSetName" column="VALSET_NAME"/>
+		<result property="valSql" column="VAL_SQL" nullValue="" />
+		<result property="lstDate" column="LSTDATE" />
+		<result property="system" column="IS_SYSTEM" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+	  <!-- 
+	  	<result property="valBeans" column="VALSET_ID" select="gmap-common.getVal"/>
+	  -->
+	</resultMap> 
+	<resultMap id="get-val" class="valBean">
+		<result property="valSetId" column="VALSET_ID" />
+		<result property="valId" column="VAL_ID"/>
+		<result property="val" column="VAL" />
+		<result property="lstDate" column="LSTDATE" />
+		<result property="system" column="IS_SYSTEM" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+	</resultMap>
+		
+  <select id="getSearchSchemaSataus" resultClass="searchSchema" parameterClass="searchSchema">
+  	select is_system_sche as systemSchema
+  				 , user_sche_value as schemaValue
+  				 from as_user_sche 
+  	       where compo_id = #compoId# and user_id = #userId# and user_sche_desc=#schemaName#
+  </select>
+  <insert id="insertSearchSchema" parameterClass="searchSchema">
+  	insert into as_user_sche(COMPO_ID, USER_ID, USER_SCHE_DESC, USER_SCHE_VALUE, IS_SYSTEM_SCHE) 
+  	       values(#compoId#, #userId#, #schemaName#, #schemaValue#, #systemSchema#)
+  </insert>
+  <delete id="deleteSearchSchema" parameterClass="searchSchema">
+  	delete from as_user_sche 
+  	       where compo_id = #compoId# and user_id = #userId# and user_sche_desc=#schemaName#
+  </delete>  
+  
+  <typeAlias alias="addItem" type="com.anyi.gp.core.action.AddItemAction"/> 
+  
+  <select id="getAreaId" resultClass="hashmap" parameterClass="map">
+  	select A.AREA_ID from AS_DESKTOP_AREA A,AS_DESKTOP T 
+						where T.AREA_ID=#areaID# and A.COMPO_ID= #componame# and A.USER_ID= #userName#
+						 and A.MENU_ID=#menuId# and A.AREA_ID=T.AREA_ID
+  </select>
+  <insert id="insertDeskTopArea" parameterClass="map">
+  	insert into AS_DESKTOP_AREA(AREA_ID,COMPO_ID,USER_ID, 
+							MENU_ID) values(#areaID#,#componame#,#userName#,#menuId#)
+  </insert>  	 
+  <select id="getIdByName" resultClass="hashmap" parameterClass="map">
+  	select  AREA_ID from AS_DESKTOP where AREA_NAME=#areaName#  and USER_ID= #userID#
+  </select>  
+  <select id="getDisplay" resultClass="hashmap" parameterClass="map">
+  	select IS_DISPLAY_REC from AS_DESKTOP where AREA_ID= #areaID# and USER_ID= #userName# 
+  </select>  
+  <select id="getAmount" resultClass="hashmap" parameterClass="map">
+  	select count(AREA_ID) AMOUNT from AS_DESKTOP_AREA where AREA_ID= #areaID# and USER_ID= #userName# 
+  </select>
+  <select id="getDisplayAmount" resultClass="hashmap" parameterClass="map">
+  	select DISPLAY_AMOUNT AMOUNT from AS_DESKTOP where AREA_ID= #areaID# and USER_ID= #userName# 
+  </select>
+  
+  <!--guohui-->
+  <select id="select_opt_val" resultClass="hashmap" parameterClass="map">
+  	select OPT_ID, CO_CODE, COMPO_ID, TRANS_TYPE, IS_SYST_OPT from as_option where OPT_ID= #optId# and CO_CODE=#coCode# and COMPO_ID=#compoId# and TRANS_TYPE=#transType#
+  </select>
+  <insert id="insert_opt_option" parameterClass="map">
+  	insert into as_option (OPT_ID,CO_CODE,COMPO_ID, TRANS_TYPE,OPT_VAL,IS_SYST_OPT) values(#optId#,#coCode#,#compoId#,#transType#,#value#,#isSys#) 
+  </insert>
+  <update id="update_opt_val" parameterClass="map">
+  	update as_option set OPT_VAL=#value# where OPT_ID=#optId# and CO_CODE=#coCode# and COMPO_ID=#compoId# and TRANS_TYPE=#transType#
+  </update>
+  <select id="getFunc" resultMap="get-funcBean" parameterClass="map">
+			select 
+			  FUNC_ID,         
+			  FUNC_DESC,       
+			  ORD_INDEX,       
+			  IS_GRANT_TO_ALL, 
+			  IS_LIST,         
+			  SHORTCUT_KEY,    
+			  IS_CTRL,        
+			  IS_SHIFT,        
+			  IS_ALT 
+			from 
+				as_func
+			<dynamic prepend="WHERE">
+				<isNotNull prepend="AND" property="funcId">
+  			 func_id=#funcId#
+  			</isNotNull> 	   
+			</dynamic>	
+  </select> 
+   
+  <select id="getValset" resultMap="get-valSet" parameterClass="map">
+  	select VALSET_ID, VALSET_NAME, VAL_SQL, LSTDATE,
+  	 			 IS_SYSTEM
+  	from as_valset
+  	<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="VALSET_ID">
+  			VALSET_ID = #VALSET_ID#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="IS_SYSTEM">
+  			IS_SYSTEM = #IS_SYSTEM#
+  		</isNotNull>	 	   
+		</dynamic>     	
+  </select>
+  <select id="getVal" resultMap="get-val" parameterClass="map">
+  	select VALSET_ID, VAL_ID, VAL, LSTDATE, ORD_INDEX,
+  	 			 IS_SYSTEM
+  	from as_val 
+  	<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="VALSET_ID">
+  			VALSET_ID = #VALSET_ID#
+  		</isNotNull>
+			<isNotNull prepend="AND" property="VAL_ID">
+  			VAL_ID = #VAL_ID#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="IS_SYSTEM">
+  			IS_SYSTEM = #IS_SYSTEM#
+  		</isNotNull>  		  			 	   
+		</dynamic>
+		order by ord_index
+  </select>
+  
+  <select id="getTransTab" resultClass="hashmap">
+  	select * from AS_LANG_TRANS
+  </select>
+  <insert id="insertTrans" parameterClass="map">
+  	insert into as_lang_trans values(#resId#, #langId#, #resName#)
+  </insert>
+   
+  <select id="getOptions" resultMap="get-option" parameterClass="map">
+  	select OPT_ID, COMPO_ID, CO_CODE, TRANS_TYPE, OPT_VAL, 
+  	       IS_SYST_OPT as IS_SYST_OPT
+  	from AS_OPTION 
+  	<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="compoId">
+  			 compo_id=#compoId#
+  			</isNotNull>
+  			<isNotNull prepend="AND" property="optId">
+  			 OPT_ID=#optId#
+  			</isNotNull>
+  			<isNotNull prepend="AND" property="coCode">
+  			 co_code=#coCode#
+  			</isNotNull>
+  			<isNotNull prepend="AND" property="IS_SYST_OPT">
+  				IS_SYST_OPT = #IS_SYST_OPT#
+  			</isNotNull>  				 	   
+	</dynamic>   
+  </select>
+   
+  <select id="getOrgPosiId" resultClass="hashmap" parameterClass="map">
+  	select ORG_POSI_ID from AS_ORG_POSITION where CO_CODE=#coCode# and ORG_CODE= #orgCode# and POSI_CODE= #poCode# and ND=#nd#
+  </select>
+  
+  <insert id="insertAsFile" parameterClass="AsFile"> 
+    insert into AS_FILE ( FILE_ID, FULL_NAME, SUFFIX_NAME, FILE_CONTENT) 
+           values ( #fileId#, #fileName#, #fileContentType#,   
+           #fileContent,handler=org.springframework.orm.ibatis.support.BlobByteArrayTypeHandler#)   
+  </insert>
+   
+  <insert id="insertAsUpload" parameterClass="AsFile"> 
+    insert into AS_UPLOAD ( FILE_ID, FILE_NAME,FILE_DESC,FILE_CREATOR,FILE_UPLOADTIME) 
+           values ( #fileId#, #fileName#,#fileDesc#,#fileCreator#,#fileUploadTime#)
+  </insert> 
+        
+  <select id="getAsFileById" resultMap="AsFileResult" parameterClass="string">
+  	select FILE_ID, FULL_NAME, SUFFIX_NAME, FILE_CONTENT from AS_FILE  where FILE_ID = #value#
+  </select>
+         
+  <delete id="deleteAsFileById" parameterClass="string">
+    delete from AS_FILE where FILE_ID = #value#
+  </delete>
+  
+  <delete id="deleteAsResourceById" parameterClass="string">
+    delete from AS_UPLOAD where FILE_ID = #value#
+  </delete>
+  
+  <select id="getPsdModiTime" resultClass="hashmap" parameterClass="map">
+  	select MODI_TIME from AS_USER where user_id = #user_Id#
+  </select>
+  
+  <update id="updatePsdModiTime"  parameterClass="map">
+  	update AS_USER set modi_time = #modi_time# where user_id = #user_Id#
+  </update>
+   
+  <update id="updateLogout"  parameterClass="map">
+  	update AS_STATINFO set STATE= 0 , LOGOUT_TIME= #CURRENT_TIME# where USER_ID  = #USER_ID#
+  </update>
+  <!--select * from as_register-->
+  <select id="getRegistered" resultClass="hashmap" parameterClass="map">
+  	select * from as_register
+  </select>
+  <select id="getIsDemo" resultClass="hashmap"  parameterClass="map">
+  	select HOST,PORT from as_anyiserver order by host, port
+  </select>
+  <select id="ifAddForeignAddBtn" resultClass="hashmap" parameterClass="map">
+  	select IS_ADD from as_foreign_entity where TAB_ID= #tabId# and F_REF_NAME=#fRefName#
+  </select>  
+  <select id="getProductVer" resultClass="hashmap">
+  	select * from  AS_PRODUCT_VER
+  </select>
+      
+  <!-- workflow condition for search-->
+  <sql id="wfsearchCondition">   
+   		<isNotNull prepend="AND" property="listtype">
+	  		<isEqual property="listtype" compareValue="WF_COMPO_DRAFT">
+	  			PROCESS_INST_ID in(select WF_DRAFT_ID from as_wf_draft d where user_id=#userid# and compo_id=#componame#)
+	  		</isEqual>
+	  		<isEqual property="listtype" compareValue="WF_FILTER_COMPO_TODO">
+	  			PROCESS_INST_ID in(select instance_id from v_wf_current_task t where executor =#userid# and compo_id=#componame#)
+	  		</isEqual>
+	  		<isEqual property="listtype" compareValue="WF_FILTER_COMPO_DONE">
+	  			PROCESS_INST_ID in(select instance_id from v_wf_action_history  h where executor = #userid# and compo_id=#componame#)
+	  		</isEqual>
+  		</isNotNull>
+  </sql> 
+  <select id="getPosiOrgCoCode" resultClass="hashmap" parameterClass="map">
+  	select aep.POSI_CODE, aep.ORG_CODE, aep.CO_CODE, ao.ORG_NAME, ap.POSI_NAME, mc.CO_NAME
+  	  from as_emp_position aep, as_org ao, as_position ap, ma_company mc 
+  	    where aep.POSI_CODE=ap.POSI_CODE
+  	      and aep.ORG_CODE=ao.ORG_CODE
+  	      and aep.CO_CODE = mc.CO_CODE
+  	      and aep.CO_CODE = ao.CO_CODE
+  	      AND aep.nd = ao.nd
+          AND ao.nd = mc.nd 
+  	      and aep.EMP_CODE = #empCode#
+  	      AND aep.nd = #nd#
+  	    order by aep.ORG_CODE, aep.POSI_CODE, aep.CO_CODE
+   </select>
+   <select id="getGroupByUserId" resultMap="GroupsResult" parameterClass="map">
+     select aug.GROUP_ID, ag.GROUP_NAME from v_as_user_group aug, as_group ag 
+     where aug.GROUP_ID = ag.GROUP_ID 
+          and aug.USER_ID = #userId#
+   </select>
+   <select id="getGroupByRoleId" resultMap="GroupsResult" parameterClass="map">
+     select aug.GROUP_ID, ag.GROUP_NAME from as_role_group aug, as_group ag 
+     where aug.GROUP_ID = ag.GROUP_ID 
+          and aug.ROLE_ID = #roleId#
+   </select>   
+   <insert id="logUserFunc"  parameterClass="map">
+     insert into as_log(GUID, OPER_TIME, USER_ID, FUNC_ID, COMPO_ID, 
+                        OPER_DESC, COMPO_NAME, IF_SUC, USER_NAME, USER_IP, PK_DESC)
+     values(#GUID#, #OPER_TIME#, #USER_ID#, #FUNC_ID#, #COMPO_ID#, 
+     		#OPER_DESC#, #COMPO_NAME#, #IF_SUC#, #USER_NAME#, #USER_IP#, #PK_DESC#)
+   </insert>
+   <select id="getIpByUserId" resultClass="hashmap" parameterClass="map">
+	 select GRANT_IP,USER_ID,PHYSICAL_ADDRESS,CTRL_TYPE from AS_IP WHERE USER_ID = #USER_ID#
+   </select>
+   <select id="getTabIdByCompoId" resultClass="hashmap" parameterClass="map">
+     select MASTER_TAB_ID from AS_COMPO where COMPO_ID= #compoId#
+   </select>
+   <select id="getTabColByTabId" resultClass="hashmap" parameterClass="map">
+     select DATA_ITEM,DATA_ITEM_NA,IS_USED,VAL_SET_ID,DATA_TYPE from AS_TAB_COL 
+       where TAB_ID=#tabId# and upper(IS_PRE)='Y'
+   </select>
+   <select id="getValsetBy" resultClass="hashmap" parameterClass="map">
+     select VALSET_NAME,VALSET_ID from AS_VALSET
+   </select>
+   <select id="getPreTabId" resultClass="hashmap" parameterClass="map">
+     select distinct TAB_ID from AS_TAB_COL where upper(IS_PRE)='Y'
+   </select>
+   <update id="updateAsTabCol" parameterClass="map">
+  	update AS_TAB_COL set DATA_ITEM_NA = #dataItemNa#, IS_USED =#isUsed#,VAL_SET_ID = #valSetId#
+  	  where DATA_ITEM=#dataItem# and upper(IS_PRE)='Y'
+   </update>
+   <update id="updateValset" parameterClass="map">
+  	update AS_VALSET set VALSET_NAME=#valSetName#
+       where VALSET_ID=#valSetId#
+   </update>
+   <delete id="deleteTicket" parameterClass="map">
+     delete from as_user_ticket where user_id = #USER_ID# and TICKET_ID = #TICKET_ID#
+   </delete>
+   <insert id="saveTicket" parameterClass="map">
+     insert into as_user_ticket(USER_ID, TICKET_ID, CREATE_TIME) values(#USER_ID#, #TICKET_ID#, #CURRENT_TIME#)
+   </insert>
+   <select id="getTicket" resultClass="hashmap" parameterClass="map">
+     select * from as_user_ticket
+     <dynamic prepend="WHERE">
+		<isNotNull prepend="AND" property="USER_ID">
+  			USER_ID = #USER_ID#
+  		</isNotNull>
+  		<isNotNull prepend="AND" property="TICKET_ID">
+  			TICKET_ID = #TICKET_ID#
+  		</isNotNull>		 	   
+	 </dynamic>
+	 order by CREATE_TIME desc
+   </select>
+         
+   <update id="updateTrans" parameterClass="map">
+  	update as_lang_trans set res_na = #resName# where res_id = #resId# and lang_id = 'C'
+   </update>
+   <insert id="publishToReport" parameterClass="map">
+	INSERT INTO AP_PUBLISH
+	  (ID,
+	   COMPONAME,
+	   REPORTTYPE,
+	   CREATETIME,
+	   CREATOR,
+	   PORTLETID,
+	   FILEPATH,
+	   TITLE)
+	VALUES
+	  (#id#,
+	  #compoName#,
+	  #reportType#,
+	  #createTime#,
+	  #creator#,
+	  #portletId#,
+	  #filePath#,
+	  #title#)
+   </insert>
+   <select id="getCaUserCount" resultClass="hashmap" parameterClass="map">
+     	select * from as_admin where user_id not in('sa')
+     <dynamic prepend="">
+				<isNotNull prepend="AND" property="userId">
+		  		USER_ID = #userId#
+		  	</isNotNull>
+	   </dynamic>
+   </select>
+   <select id="getTabColsById" resultClass="hashmap" parameterClass="map">
+  	select data_item, val_set_id from as_tab_col where tab_id=#tableName# and val_set_id is not null
+  </select> 
+   <select id="getValSetById" resultClass="hashmap" parameterClass="map">
+  	select val_id, val from as_val where valset_id = #valSetId#
+  </select> 
+</sqlMap>
+

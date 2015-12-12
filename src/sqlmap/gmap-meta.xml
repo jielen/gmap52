@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.2//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gmap-meta">
+	<typeAlias alias="compoMeta" type="com.anyi.gp.meta.CompoMeta"/>
+	<typeAlias alias="tableMeta" type="com.anyi.gp.meta.TableMeta"/>
+	<typeAlias alias="compoCall" type="com.anyi.gp.meta.Call"/>
+	<typeAlias alias="tableMetaField" type="com.anyi.gp.meta.Field"/>
+	<typeAlias alias="tableMetaForeign" type="com.anyi.gp.meta.Foreign"/>
+	
+	<resultMap id="get-compo-result" class="compoMeta">
+		<result property="name" column="COMPO_ID" />
+		<result property="masterTable" column="MASTER_TAB_ID" />
+		<result property="noField" column="NO_FIELD" nullValue=""/>
+		<result property="typeField" column="TYPE_FIELD" nullValue=""/>
+		<result property="typeTable" column="TYPE_TABLE" nullValue=""/>
+		<result property="parentName" column="PARENT_COMPO" nullValue=""/>
+		<result property="titleField" column="TITLE_FIELD" nullValue=""/>
+		<result property="wfFlowType" column="WF_FLOW_TYPE" nullValue=""/>	
+		<result property="wfListType" column="WF_LIST_TYPE" nullValue=""/>	
+		<result property="wfDefTemp" column="DEFAULT_WF_TEMPLATE" nullValue=""/>
+		<result property="wfTempUsed" column="TEMPLATE_IS_USED" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>				
+		<result property="autoList" column="IS_AUTO_LIST" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>				
+		<result property="orderBy" column="ORDER_BY" nullValue=""/>
+		<result property="grantToAll" column="IS_GRANT_TO_ALL" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>				
+		<result property="dateField" column="DATE_FIELD" nullValue=""/>
+		<result property="titleDate" column="TITLE_DATE" nullValue=""/>
+		<result property="printType" column="PRINT_TYPE" nullValue=""/>
+		<result property="valsetField" column="VALSET_FIELD" nullValue=""/>
+		<result property="briefFields" column="WF_BRIEF_FIELDS" nullValue=""/>
+	</resultMap>
+	<resultMap id="get-call-result" class="compoCall">
+		<result property="name" column="FUNC_ID" />
+		<result property="wrLog" column="IS_WR_LOG" javaType="boolean" jdbcType="VARCHAR" nullValue="y" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+	</resultMap>
+	<resultMap id="get-tableField" class="tableMetaField">
+		<result property="fk" column="fk" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="pk" column="pk" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="save" column="is_save" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="list" column="list" javaType="boolean" jdbcType="VARCHAR" nullValue="y" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="sele" column="sele" javaType="boolean" jdbcType="VARCHAR" nullValue="y" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="allowNull" column="allowNull" javaType="boolean" jdbcType="VARCHAR" nullValue="y" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="used" column="used" javaType="boolean" jdbcType="VARCHAR" nullValue="y" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="name" column="data_item" />
+		<result property="type" column="type" />
+		<result property="defaultValue" column="defaultValue" nullValue="" />
+		<result property="maxValue" column="maxValue" javaType="int" nullValue="0"/>
+		<result property="minValue" column="minValue" javaType="int" nullValue="0"/>
+		<result property="decLength" column="decLength" javaType="int" nullValue="0" />
+		<result property="vscode" column="vscode"/>
+		<result property="minLength" column="minLength" javaType="int" nullValue="0"/>
+		<result property="refName" column="refName" />
+		<result property="refField" column="refField" />
+		<result property="vsEffectTable" column="vsEffectTable" />
+		<result property="url" column="url" />
+		<result property="dataItemDesc" column="dataItemDesc" />
+		<result property="kiloStyle" column="kiloStyle" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="treeView" column="treeView" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="onlyLeaf" column="onlyLeaf" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback"/>
+		<result property="editBoxType" column="editBoxType" />
+		<result property="length" column="length" javaType="int" nullValue="100"/>
+	</resultMap>
+	
+	<resultMap id="get-tableForeign" class="tableMetaForeign">
+		<result property="tabRefName" column="tabRefName" />
+		<result property="multiSel" column="multiSel" javaType="boolean" jdbcType="VARCHAR" nullValue="n" typeHandler="com.anyi.gp.access.YNBoolTypeHandlerCallback" />
+		<result property="tableName" column="tableName" />
+		<result property="refName" column="refName" />
+		<result property="compoName" column="compoName" nullValue=""/>
+	</resultMap>
+	
+	<select id="getCompoMeta" resultMap="get-compo-result" parameterClass="java.lang.String">
+		select COMPO_ID, MASTER_TAB_ID, NO_FIELD, TYPE_FIELD, TYPE_TABLE, PARENT_COMPO,
+					 TITLE_FIELD, WF_FLOW_TYPE, WF_LIST_TYPE, DEFAULT_WF_TEMPLATE, 
+					 TEMPLATE_IS_USED,
+					 IS_AUTO_LIST, 
+					 IS_GRANT_TO_ALL,
+					 ORDER_BY, DATE_FIELD, TITLE_DATE, PRINT_TYPE, VALSET_FIELD, WF_BRIEF_FIELDS
+		from as_compo 
+		where compo_id = #compo_id#
+	</select>
+	<select id="getCompoCall" resultMap="get-call-result" parameterClass="java.lang.String">
+		select COMPO_ID, FUNC_ID, IS_WR_LOG 
+		from as_compo_func where compo_id = #compo_id#
+	</select>
+	<select id="getCompoNoRule" resultClass="java.util.HashMap" parameterClass="java.lang.String">
+		select NO_FIELD from as_no_rule where compo_id = #compo_id#
+	</select>
+	<select id="getTableMeta" resultClass="java.util.HashMap" parameterClass="java.lang.String">
+		select * from as_table where tab_id = #master_tab_id# or master_tab_id = #master_tab_id# order by master_tab_id desc
+	</select>	
+	<select id="getTableField" resultMap="get-tableField" parameterClass="map">
+		SELECT												
+		  DATA_ITEM  as data_item,																								
+		  DATA_ITEM_DESC as dataItemDesc,																								
+		  DATA_TYPE as type,													
+		  DATA_LEN  as length,													
+		  DEC_LEN as decLength,													
+		  F_REF_NAME as refName,													
+		  F_FIELD as refField,													
+		  IS_SAVE as is_save,													
+		  VAL_SET_ID as vscode,													
+		  IS_FPK as fk,												
+		  IS_USED as used,																								
+		  IS_PK as pk,													
+		  IS_NULL as allowNull,																								
+		  IS_LIST as list,													
+		  IS_SELE as sele,													
+		  DFLT_VAL as defaultValue,																																																
+		  MIN_VALUE as minValue,													
+		  MAX_VALUE as maxValue,													
+		  MIN_LENGTH as minLength,																									
+		  VS_EFFECT_TABLE as vsEffectTable,													
+		  URL as url,													
+		  IS_KILO_STYLE as kiloStyle,													
+		  IS_TREEVIEW as treeView,													
+		  IS_ONLYLEAF as onlyLeaf,													
+		  EDIT_BOX_TYPE as editBoxType     													
+		FROM 
+			as_tab_col
+		where 
+			tab_id = #tabid#
+		order by ord_index     														
+  </select>	
+	<select id="getForeign" resultMap="get-tableForeign" parameterClass="map">
+		SELECT  
+			TAB_ID as tableName,     
+		  F_REF_NAME as refName,
+		  F_COMPO_ID as compoName,       
+		  IS_MULTI_SEL as multiSel,
+		  TAB_REF_NAME as tabRefName
+		FROM
+			as_foreign_entity
+		WHERE
+		  TAB_ID=#tabid# 
+	</select>
+	<select id="getColRelation" resultClass="hashmap" parameterClass="map">
+		select S_FIELD, D_FIELD from as_col_relation where f_ref_name=#f_ref_name# and tab_id = #tab_id#
+	</select>
+</sqlMap>

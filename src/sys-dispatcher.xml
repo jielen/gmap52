@@ -1,0 +1,45 @@
+<!DOCTYPE xwork PUBLIC
+    "-//OpenSymphony Group//XWork 1.0//EN"
+    "http://www.opensymphony.com/xwork/xwork-1.0.dtd"
+ >
+
+<xwork>
+	<package name="sys-dispatcher" extends="xwork-gmap">
+		<!-- jsp dispatcher -->
+		<action name="dispatcher" class="pageDispatcherAction">
+		  <result name="mainFrame" type="dispatcher">/mainFrame.jsp</result>
+		  <result name="title" type="dispatcher">/title.jsp</result>
+		  <result name="global" type="dispatcher">/global.jsp</result>
+		  <result name="mainHome" type="dispatcher">/main.jsp</result>
+		  <result name="privilege" type="dispatcher">/privilege.jsp</result>		  
+		  <result name="selectPage" type="dispatcher">/jsp/platform/selectPage.jsp</result>
+		  <result name="selectTreePage" type="dispatcher">/jsp/platform/selectTreePage.jsp</result>
+		  <result name="searchPage" type="dispatcher">/jsp/platform/searchPage.jsp</result>
+		  <result name="createMenu" type="dispatcher">/jsp/platform/createMenu.jsp</result>
+		  <result name="privmenu" type="dispatcher">/jsp/platform/privMenu.jsp</result>
+		  <result name="privleft" type="dispatcher">/jsp/platform/privLeft.jsp</result>
+		  <result name="fieldList" type="dispatcher">/jsp/platform/FieldList.jsp</result>		  
+		  <result name="passwd" type="dispatcher">/jsp/platform/passwd.jsp</result>
+		  <result name="resetPsd" type="dispatcher">/jsp/platform/resetPsd.jsp</result>
+		  <result name="dynamicPrintSet" type="dispatcher">/jsp/print/dynamicPrintSet.jsp</result>
+		  <result name="prntempdesigner" type="dispatcher">/jsp/print/prntempdesigner.jsp</result>
+		  <result name="printPreview" type="dispatcher">/jsp/print/printPreview.jsp</result>		  		  		  
+		  <result name="commentDialog" type="dispatcher">/jsp/wf/commentDialog.jsp</result>
+		  <result name="processHistory" type="dispatcher">/jsp/wf/processHistory.jsp</result>	
+		  <result name="optionDialog" type="dispatcher">/jsp/wf/commitDialog.jsp</result>			
+		  <result name="prnsvariabledesigner" type="dispatcher">/jsp/print/prnsvariabledesigner.jsp</result>
+		  <result name="prnsltfielddesigner" type="dispatcher">/jsp/print/prnsltfielddesigner.jsp</result>
+		  <result name="PrnSetPicdesigner" type="dispatcher">/jsp/print/PrnSetPicdesigner.jsp</result>
+		  <result name="PrnSetBGPicdesigner" type="dispatcher">/jsp/print/PrnSetBGPicdesigner.jsp</result>
+		  <result name="printSetupdesigner" type="dispatcher">/jsp/print/printSetupdesigner.jsp</result>
+		  <result name="prntemplatedistribute" type="dispatcher">/jsp/print/printTempDist.jsp</result>
+		  <result name="groupPageDesigner" type="dispatcher">/jsp/platform/groupPageDesigner.jsp</result>
+		  <result name="editGroupPage" type="dispatcher">/jsp/platform/editGroupPage.jsp</result>
+		  <result name="groupCopyDesigner" type="dispatcher">/jsp/platform/groupCopyDesigner.jsp</result>
+		  <result name="main" type="dispatcher">/jsp/admin/AS_PRECOL_main.jsp</result>
+		  <result name="top" type="dispatcher">/jsp/admin/AS_PRECOL_top.jsp</result>
+		  <result name="articlePublish" type="dispatcher">/jsp/admin/AS_ARTICLE_Publish.jsp</result>
+		  <result name="checkPwd" type="dispatcher">/jsp/platform/checkPwd.jsp</result>
+		</action>																														
+	</package>
+</xwork>	

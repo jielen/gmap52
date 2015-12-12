@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.2//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gmap-menu">
+  <typeAlias alias="title" type="com.anyi.gp.desktop.Title"/>
+  
+  <resultMap id="titleResult" class="title">
+	<result property="groupId" column="GROUP_ID" />
+	<result property="titleId" column="PAGE_ID" />
+	<result property="titleName" column="PAGE_TITLE" />
+	<result property="index" column="PAGE_ORDER" nullValue="0"/>
+	<result property="titleDesc" column="PAGE_DESC" />
+	<result property="titleUrl" column="PAGE_URL" />
+	<!-- 
+	<result property="colCount" column="COLUMNCOUNT" nullValue="2"/>
+	 -->	
+  </resultMap>
+	
+  <select id="selectGroupPageBySa" resultMap="titleResult" parameterClass="java.lang.String">
+	 select u.GROUP_ID, u.PAGE_ID, u.PAGE_ORDER, '' as PAGE_DESC, u.PAGE_TITLE, u.PAGE_URL
+	 	from ap_group_page u 
+	 	where u.group_id = 'sa'
+	 union all
+	 select 'sa' as GROUP_ID, m.menu_id as PAGE_ID, m.ord_index as PAGE_ORDER, '' as PAGE_DESC, t.res_na as PAGE_TITLE, '' as PAGE_URL
+		from as_menu m, as_lang_trans t
+		where ((parent_id is null and menu_id not in ('GRP_FI','GRP_GFI')) or parent_id in ('GRP_FI','GRP_GFI')) 
+		and m.menu_id = t.res_id
+	 order by page_order
+  </select>
+
+  <select id="selectGroupPage" resultMap="titleResult" parameterClass="java.lang.String">
+	 select u.GROUP_ID, u.PAGE_ID, u.PAGE_ORDER, '' as PAGE_DESC, u.PAGE_TITLE, u.PAGE_URL
+	 	from ap_group_page u 
+	 	where u.group_id = #groupId# order by page_order
+  </select>
+  
+  <select id="selectMenu" resultClass="hashmap" parameterClass="java.lang.String">
+	SELECT m.MENU_ID, m.MENU_NAME, m.ORD_INDEX, m.PARENT_ID
+	  FROM ap_menu m
+	 WHERE EXISTS (SELECT menu_id FROM ap_menu WHERE m.parent_id = menu_id)
+	    OR m.parent_id = #rootCode#
+	    OR m.menu_id = #rootCode#
+	UNION all
+	SELECT sm.MENU_ID, lt.RES_NA, sm.ORD_INDEX, sm.PARENT_ID
+	  FROM as_menu sm, as_lang_trans lt
+	 WHERE sm.menu_id = lt.res_id
+	   AND (EXISTS (SELECT menu_id FROM as_menu WHERE sm.parent_id = menu_id) OR
+	        sm.parent_id = #rootCode# OR sm.menu_id = #rootCode#)
+	 ORDER BY parent_id DESC, ord_index 
+  </select>
+
+  <select id="selectMenuCompoBySa" resultClass="hashmap" parameterClass="map">
+	select pm.MENU_ID, pm.COMPO_ID, pm.COMPO_NAME, pm.ORD_INDEX, pm.IS_GOTO_EDIT, pm.IS_ALWAYS_NEW, pm.URL, pm.IS_IN_MENU
+		from ap_menu_compo pm
+		<dynamic prepend="WHERE">
+			<isNotNull prepend="AND" property="isInMenu">
+  				upper(pm.is_in_menu) = #isInMenu#
+  			</isNotNull>	 	   
+		</dynamic>
+	union all
+	select sm.MENU_ID, sm.COMPO_ID, lt.res_na as COMPO_NAME, sm.ORD_INDEX, sm.IS_GOTO_EDIT, sm.IS_ALWAYS_NEW, sm.URL, sm.IS_IN_MENU
+		from as_menu_compo sm, as_lang_trans lt
+			where sm.compo_id = lt.res_id
+		<dynamic prepend="">
+			<isNotNull prepend="AND" property="isInMenu">
+  				upper(sm.is_in_menu) = #isInMenu#
+  			</isNotNull>	 	   
+		</dynamic>
+	order by ORD_INDEX	 
+  </select>
+
+  <select id="selectMenuCompo" resultClass="hashmap" parameterClass="map">
+	select sm.MENU_ID, sm.COMPO_ID, sm.COMPO_NAME, sm.ORD_INDEX, sm.IS_GOTO_EDIT, sm.IS_ALWAYS_NEW, sm.URL, sm.IS_IN_MENU
+		from ap_menu_compo sm, ap_menu m,
+		(
+		SELECT COMPO_ID FROM AS_USER_FUNC where user_id = #userId#
+     	UNION ALL
+     	SELECT b.compo_id FROM as_compo_func b, as_compo c
+     		WHERE (c.is_grant_to_all = 'Y' OR c.is_grant_to_all = 'y')
+           		AND b.compo_id = c.compo_id
+     	UNION ALL
+     	SELECT b.compo_id FROM as_user a, as_role_func b, as_emp c, as_emp_role d
+          	WHERE a.user_id = c.user_id AND c.emp_code = d.emp_code
+            	AND d.role_id = b.role_id AND a.user_id = #userId#
+		UNION ALL
+		SELECT b.compo_id
+     		FROM AS_USER a, AS_ROLE_FUNC b, AS_EMP c, AS_EMP_POSITION d, AS_POSI_ROLE e
+      		WHERE a.USER_ID = c.USER_ID AND c.EMP_CODE = d.EMP_CODE 
+      			AND d.POSI_CODE = e.POSI_CODE AND e.ROLE_ID = b.ROLE_ID
+      			AND b.func_id != 'fquote' AND a.user_id = #userId#
+				AND d.co_code = #coCode# AND d.org_code = #orgCode#
+			<dynamic prepend="">
+				<isNotNull prepend="AND" property="posiCode">
+  					d.POSI_CODE = #posiCode#
+  				</isNotNull>	 	   
+			</dynamic>	 
+      	) c 
+		where sm.menu_id = m.menu_id
+			and (m.parent_id in (select menu_id from ap_menu) or m.parent_id = #rootCode# or m.menu_id = #rootCode#)
+			and sm.compo_id = c.compo_id  
+		<dynamic prepend="">
+			<isNotNull prepend="AND" property="isInMenu">
+  				upper(sm.is_in_menu) = #isInMenu#
+  			</isNotNull>	 	   
+		</dynamic>
+	order by ORD_INDEX	 
+  </select>
+  
+  <select id="selectUserMenu" resultClass="hashmap" parameterClass="map">
+  	select sm.MENU_ID, sm.COMPO_ID
+		from ap_menu_compo sm,
+		(
+		SELECT COMPO_ID FROM AS_USER_FUNC where user_id = #userId#
+     	UNION ALL
+     	SELECT b.compo_id FROM as_compo_func b, as_compo c
+     		WHERE (c.is_grant_to_all = 'Y' OR c.is_grant_to_all = 'y')
+           		AND b.compo_id = c.compo_id
+     	UNION ALL
+     	SELECT b.compo_id FROM as_user a, as_role_func b, as_emp c, as_emp_role d
+          	WHERE a.user_id = c.user_id AND c.emp_code = d.emp_code
+            	AND d.role_id = b.role_id AND a.user_id = #userId#
+		UNION ALL
+		SELECT b.compo_id
+     		FROM AS_USER a, AS_ROLE_FUNC b, AS_EMP c, AS_EMP_POSITION d, AS_POSI_ROLE e
+      		WHERE a.USER_ID = c.USER_ID AND c.EMP_CODE = d.EMP_CODE 
+      			AND d.POSI_CODE = e.POSI_CODE AND e.ROLE_ID = b.ROLE_ID
+      			AND b.func_id != 'fquote' AND a.user_id = #userId#
+				AND d.co_code = #coCode# AND d.org_code = #orgCode#
+			<dynamic prepend="">
+				<isNotNull prepend="AND" property="posiCode">
+  					d.POSI_CODE = #posiCode#
+  				</isNotNull>	 	   
+			</dynamic>	 
+      	) c
+      	where sm.compo_id = c.compo_id
+      	<dynamic prepend="">
+			<isNotNull prepend="AND" property="isInMenu">
+  				upper(sm.is_in_menu) = #isInMenu#
+  			</isNotNull>	 	   
+		</dynamic>
+  </select>
+     
+</sqlMap>
